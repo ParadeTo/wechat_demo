@@ -6,8 +6,10 @@
   "dependencies": {
     "bluebird": "^3.3.5",
     "koa": "^1.2.0",
+    "raw-body": "^2.1.6",
+    "request": "^2.72.0",
     "sha1": "^1.1.1",
-    "request": "^2.72.0"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {},
   "scripts": {
