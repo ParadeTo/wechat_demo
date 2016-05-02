@@ -9,8 +9,8 @@ var getRawBody = require('raw-body');
 var Wechat = require('./wechat');
 var util = require('../libs/util');
 
-module.exports = function(opts) {
-    //var wechat = new Wechat(opts);
+module.exports = function(opts, handler) {
+    var wechat = new Wechat(opts);
     return function *(next) {
         var that = this;
         var token = opts.token;
@@ -34,17 +34,6 @@ module.exports = function(opts) {
                 this.body = 'wrong';
                 return false;
             }
-            // 获取post过来的数据
-            /**
-             <xml><ToUserName><![CDATA[gh_5cf9bdf8f7f5]]></ToUserName>//开发者
-             <FromUserName><![CDATA[oJJPgw4ibwCrtLAjiA6F_PAHDCVo]]></FromUserName>//发送方
-             <CreateTime>1461807724</CreateTime>
-             <MsgType><![CDATA[event]]></MsgType>
-             <Event><![CDATA[subscribe]]></Event>
-             <EventKey><![CDATA[]]></EventKey>
-             </xml>
-             */
-
             var data = yield getRawBody(this.req, {
                 length: this.length,
                 limit: '1mb',
@@ -55,33 +44,33 @@ module.exports = function(opts) {
             var message = util.formatMessage(content.xml)
             console.log(message);
 
-            if (message.MsgType === 'event') {
-                if (message.Event === 'subscribe') {
-                    var now = new Date().getTime();
-                    that.status = 200;
-                    that.type = 'application/xml';
-                    that.body = ' <xml>'+
-                    '<ToUserName><![CDATA[' + message.FromUserName + ']]></ToUserName>' +
-                    '<FromUserName><![CDATA[' + message.ToUserName + ']]></FromUserName>' +
-                    '<CreateTime>' + now + '</CreateTime>' +
-                    '<MsgType><![CDATA[text]]></MsgType>' +
-                    '<Content><![CDATA[是我的小妹子吗？更多功能请稍候哦]]></Content>' +
-                    '</xml>';
-                    return;
-                }
-            } else if (message.MsgType === 'text') {
-                var now = new Date().getTime();
-                that.status = 200;
-                that.type = 'application/xml';
-                that.body = ' <xml>'+
-                '<ToUserName><![CDATA[' + message.FromUserName + ']]></ToUserName>' +
-                '<FromUserName><![CDATA[' + message.ToUserName + ']]></FromUserName>' +
-                '<CreateTime>' + now + '</CreateTime>' +
-                '<MsgType><![CDATA[text]]></MsgType>' +
-                '<Content><![CDATA[我是最帅的男盆友！]]></Content>' +
-                '</xml>';
-                return;
-            }
+            this.weixin = message;
+
+            // 交给外层处理
+            yield handler.call(this, next);
+
+            wechat.reply.call(this);
+            //if (message.MsgType === 'event') {
+            //    if (message.Event === 'subscribe') {
+            //        var now = new Date().getTime();
+            //        that.status = 200;
+            //        that.type = 'application/xml';
+            //        that.body = xml
+            //        return;
+            //    }
+            //} else if (message.MsgType === 'text') {
+            //    var now = new Date().getTime();
+            //    that.status = 200;
+            //    that.type = 'application/xml';
+            //    that.body = ' <xml>'+
+            //    '<ToUserName><![CDATA[' + message.FromUserName + ']]></ToUserName>' +
+            //    '<FromUserName><![CDATA[' + message.ToUserName + ']]></FromUserName>' +
+            //    '<CreateTime>' + now + '</CreateTime>' +
+            //    '<MsgType><![CDATA[text]]></MsgType>' +
+            //    '<Content><![CDATA[我是最帅的男盆友！]]></Content>' +
+            //    '</xml>';
+            //    return;
+            //}
         }
     }
 }

@@ -6,6 +6,7 @@
 var fs = require('fs');
 var Promise = require('bluebird');
 var xml2js = require('xml2js');
+var tpl = require('./tpl');
 
 
 exports.readFileAsync = function(fpath, encoding) {
@@ -74,7 +75,35 @@ function formatMessage (result) {
             }
         }
     }
-    return message
+    return message;
 }
+
 exports.formatMessage = formatMessage;
+
+/**
+ *
+ * @param content 回复的消息对象
+ * @param message 得到的消息对象
+ * @returns {*}
+ */
+exports.tpl = function(content, message) {
+    var info = {};
+    var type = 'text';
+    var fromUserName = message.FromUserName;
+    var toUserName = message.ToUserName;
+
+    if (Array.isArray(content)) {
+        type = 'news';
+    }
+
+    console.log('content:'+content);
+    type = content.type || type;
+    info.content = content;
+    info.createTime = new Date().getTime();
+    info.msgType = type;
+    info.toUserName = fromUserName;
+    info.fromUserName = toUserName;
+
+    return tpl.compiled(info);
+};
 

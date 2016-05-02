@@ -4,28 +4,15 @@
 'use strict'
 
 var Koa = require('koa');
+var staticServer = require('koa-static');
 var path = require('path');
+var config = require('./config');
+var weixin = require('./weixin');
 var wechat = require('./wechat/g');
-var util = require('./libs/util');
-var wechat_file = path.join(__dirname, './config/wechat.txt')
-var config = {
-    wechat: {
-        appID: 'wx26d08f3077dfca3e',
-        appSecret: '635b0889021346fd4d9e7a1380247fdd',
-        token:'youxingzhi',
-        getAccessToken: function() {
-            return util.readFileAsync(wechat_file);
-        },
-        saveAccessToken: function(data) {
-            data = JSON.stringify(data);
-            return util.writeFileAsync(wechat_file,data);
-        }
-    }
-}
 
 var app = new Koa();
-
-app.use(wechat(config.wechat));
+app.use(staticServer(path.join(__dirname, 'public')));
+app.use(wechat(config.wechat, weixin.reply));
 
 app.listen(9999);
 console.log("Listening:9999");
