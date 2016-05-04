@@ -128,10 +128,12 @@ exports.reply = function* (next) {
         else if (content === '10') {
             var picData = yield wechatApi.uploadMaterial('image', __dirname +
             '/public/images/cs/1.jpg',{});
+            console.log('picData:');
+            console.log(picData);
             var media = {
                 articles: [{
                     title: '图片',
-                    thumbMediaId: picData.media_id,
+                    thumb_media_id: picData.media_id,
                     author: 'Scott',
                     digest: '摘要',
                     show_cover_pic: 1,
@@ -139,16 +141,16 @@ exports.reply = function* (next) {
                     content_source_url: 'http://www.baidu.com'
                 }]
             };
-            var data = yield wechatApi.updateMaterial('news', media, {});
+            var data = yield wechatApi.uploadMaterial('news', media, {});
             console.log('data1:');
             console.log(data);
-            data = yield wechatApi.fetchMaterial(data.media_id);
+            data = yield wechatApi.fetchMaterial(data.media_id, 'news', {});
             console.log('data:');
             console.log(data);
-            var item = data.news_item;
+            var items = data.news_item;
             var news = [];
 
-            item.forEach(function(item) {
+            items.forEach(function(item) {
                news.push({
                    title: item.title,
                    description: item.digest,
@@ -158,6 +160,47 @@ exports.reply = function* (next) {
             });
 
             reply = news;
+        }
+        else if (content === '11') {
+            var counts = yield wechatApi.countMaterial();
+            console.log(JSON.stringify(counts));
+            var results = yield [
+                wechatApi.batchMaterial({
+                    offset: 0,
+                    count: 10,
+                    type:'image'
+                }),
+                wechatApi.batchMaterial({
+                    offset: 0,
+                    count: 10,
+                    type:'video'
+                }),
+                wechatApi.batchMaterial({
+                    offset: 0,
+                    count: 10,
+                    type:'voice'
+                }),
+                wechatApi.batchMaterial({
+                    offset: 0,
+                    count: 10,
+                    type:'news'
+                })
+            ];
+            console.log(results);
+            reply = '1';
+        }
+        else if (content === '12') {
+            var group = yield wechatApi.createGroup('wechat');
+            console.log('新分组 wechat');
+            console.log(group);
+            var groups = yield wechatApi.fetchGroups();
+            console.log('分组列表');
+            console.log(groups);
+
+            var group2 = yield wechatApi.checkGroup(message.FromUserName);
+            console.log('查看');
+            console.log(group2);
+            reply = 'Group done!';
         }
         else if (content === '长沙') {
             reply = [
