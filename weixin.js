@@ -202,6 +202,24 @@ exports.reply = function* (next) {
             console.log(group2);
             reply = 'Group done!';
         }
+        else if (content === '13') {
+            var user = yield wechatApi.fetchUsers(message.FromUserName);
+            console.log(user);
+            var openIds = [
+                {
+                    openid: message.FromUserName,
+                    lang: 'en'
+                }
+            ];
+            var users = yield wechatApi.fetchUsers(openIds);
+            console.log(users);
+            reply = JSON.stringify(user);
+        }
+        else if (content === '14') {
+            var userlist = yield wechatApi.listUsers();
+            console.log(userlist);
+            reply = userlist.total;
+        }
         else if (content === '长沙') {
             reply = [
                 {

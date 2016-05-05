@@ -34,6 +34,15 @@ var api = {
     move: prefix + 'groups/members/update?',
     batchupdate: prefix + 'groups/members/batchupdate?',
     del: prefix + 'groups/delete?'
+  },
+  user: {
+    remark: prefix + 'user/info/updateremark?',
+    fetch: prefix + 'user/info?',
+    batchFetch: prefix + 'user/info/batchget?',
+    list: prefix + 'user/get?'
+  },
+  mass: {
+    sendByGroup: prefix + 'message/mass/sendall?'
   }
 };
 
@@ -598,6 +607,169 @@ Wechat.prototype.deleteGroup = function(id) {
               resolve(_data);
             } else {
               throw new Error('Delete group fails');
+            }
+          })
+              .catch(function(err) {
+                reject(err);
+              });
+        });
+  });
+};
+
+/**
+ *
+ * @param id
+ */
+Wechat.prototype.remarkUser = function(openId, remark) {
+  var that = this;
+
+  return new Promise(function(resolve, reject) {
+    that
+        .fetchAccessToken()
+        .then(function (data) {
+          var url = api.user.remark + 'access_token=' + data.access_token;
+          var form = {
+            openid: openId,
+            remark: remark
+          };
+          request({
+            method:'POST',
+            url:url,
+            body: form,
+            json: true
+          }).then(function(response) {
+            var _data = response.body;
+            if (_data) {
+              resolve(_data);
+            } else {
+              throw new Error('Remark user fails');
+            }
+          })
+              .catch(function(err) {
+                reject(err);
+              });
+        });
+  });
+};
+
+/**
+ * 获取用户信息
+ * @param openIds
+ * @returns {*}
+ */
+Wechat.prototype.fetchUsers = function(openIds, lang) {
+  var that = this;
+
+  lang = lang || 'zh-CN';
+
+  return new Promise(function(resolve, reject) {
+    that
+        .fetchAccessToken()
+        .then(function (data) {
+          var options = {
+            json: true
+          }
+          if (_.isArray(openIds)) {
+            options.url = api.user.batchFetch + 'access_token=' + data.access_token;
+            options.body = {
+              user_list: openIds
+            };
+            options.method = 'POST';
+          }
+          else {
+            options.url = api.user.fetch + 'access_token=' + data.access_token +
+            '&openid=' + openIds + '&lang=' + lang;
+          }
+
+          request(options).then(function(response) {
+            var _data = response.body;
+            if (_data) {
+              resolve(_data);
+            } else {
+              throw new Error('Fetch users fails');
+            }
+          })
+              .catch(function(err) {
+                reject(err);
+              });
+        });
+  });
+};
+
+/**
+ * 获取用户列表
+ * @param openId
+ * @returns {*}
+ */
+Wechat.prototype.listUsers = function(openId) {
+  var that = this;
+
+  return new Promise(function(resolve, reject) {
+    that
+        .fetchAccessToken()
+        .then(function (data) {
+          var url = api.user.list + 'access_token=' + data.access_token;
+          if (openId) {
+            url += '&next_openid=' + openId;
+          }
+          request({
+            url:url,
+            json: true
+          }).then(function(response) {
+            var _data = response.body;
+            if (_data) {
+              resolve(_data);
+            } else {
+              throw new Error('List users fails');
+            }
+          })
+              .catch(function(err) {
+                reject(err);
+              });
+        });
+  });
+};
+
+/**
+ *
+ * @param type
+ * @param message
+ * @param groupId
+ * @returns {*}
+ */
+Wechat.prototype.sendByGroup = function(type, message, groupId) {
+  var that = this;
+  var msg = {
+    filter: {},
+    msgtype: type
+  };
+
+  if (!groupId) {
+    msg.filter.is_to_all = true;
+  } else {
+    msg.filter = {
+      is_to_all:  false,
+      group_id: groupId
+    }
+  }
+
+  return new Promise(function(resolve, reject) {
+    that
+        .fetchAccessToken()
+        .then(function (data) {
+          var url = api.mass.group + 'access_token=' + data.access_token;
+
+          request({
+            method: 'POST',
+            body: msg,
+            url:url,
+            json: true
+          }).then(function(response) {
+            var _data = response.body;
+            if (_data) {
+              resolve(_data);
+            } else {
+              throw new Error('Send by group fails');
             }
           })
               .catch(function(err) {
