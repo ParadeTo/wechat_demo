@@ -730,6 +730,8 @@ Wechat.prototype.listUsers = function(openId) {
   });
 };
 
+
+// 以下是发消息
 /**
  *
  * @param type
@@ -744,6 +746,8 @@ Wechat.prototype.sendByGroup = function(type, message, groupId) {
     msgtype: type
   };
 
+  msg[type] = message
+
   if (!groupId) {
     msg.filter.is_to_all = true;
   } else {
@@ -757,7 +761,7 @@ Wechat.prototype.sendByGroup = function(type, message, groupId) {
     that
         .fetchAccessToken()
         .then(function (data) {
-          var url = api.mass.group + 'access_token=' + data.access_token;
+          var url = api.mass.sendByGroup + 'access_token=' + data.access_token;
 
           request({
             method: 'POST',

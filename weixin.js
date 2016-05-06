@@ -186,7 +186,7 @@ exports.reply = function* (next) {
                     type:'news'
                 })
             ];
-            console.log(results);
+            console.log(JSON.stringify(results));
             reply = '1';
         }
         else if (content === '12') {
@@ -219,6 +219,18 @@ exports.reply = function* (next) {
             var userlist = yield wechatApi.listUsers();
             console.log(userlist);
             reply = userlist.total;
+        }
+        // 测试号发不了
+        else if (content === '15') {
+            var mpnews = {
+                media_id: 'M50gNASgkWfAmCAruVMxxauKDbpcZXQXG-J4uxcZpGE'
+            }
+            var text = 'Hello ayou';
+            var msgData = yield wechatApi.sendByGroup('mpnews', mpnews);
+
+            console.log('msgData:');
+            console.log(msgData);
+            reply = 'Yeah!';
         }
         else if (content === '长沙') {
             reply = [
