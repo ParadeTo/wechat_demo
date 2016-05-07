@@ -42,7 +42,10 @@ var api = {
     list: prefix + 'user/get?'
   },
   mass: {
-    sendByGroup: prefix + 'message/mass/sendall?'
+    sendByGroup: prefix + 'message/mass/sendall?',
+    openId: prefix + 'message/mass/send?',
+    del: prefix + 'message/mass/delete?',
+    preview: prefix +'message/mass/preview?'
   }
 };
 
@@ -113,11 +116,11 @@ Wechat.prototype.fetchAccessToken = function(data) {
       } catch(e) {
         return that.updateAccessToken();
       }
-      // 如果合法，向下传递
+      // 濡傛灉鍚堟硶锛屽悜涓嬩紶閫�
       if (that.isValidAccessToken(data)) {
         return Promise.resolve(data);
       }
-      // 不合法，则更新
+      // 涓嶅悎娉曪紝鍒欐洿鏂�
       else {
         return that.updateAccessToken();
       }
@@ -133,7 +136,7 @@ Wechat.prototype.fetchAccessToken = function(data) {
 /**
  *
  * @param type
- * @param material 图文时传递的是一个数组，图片或视频的话，为路径
+ * @param material 鍥炬枃鏃朵紶閫掔殑鏄竴涓暟缁勶紝鍥剧墖鎴栬棰戠殑璇濓紝涓鸿矾寰�
  * @param permanent
  * @returns {*}
  */
@@ -145,16 +148,16 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent) {
     uploadUrl = api.permanent.upload;
     _.extend(form, permanent);
   }
-  // 图文消息里的图片
+  // 鍥炬枃娑堟伅閲岀殑鍥剧墖
   if (type === 'pic') {
     uploadUrl = api.permanent.uploadNewsPic;
   }
-  // 图文
+  // 鍥炬枃
   if (type === 'news') {
     uploadUrl = api.permanent.uploadNews;
     form = material;
   }
-  // 文件路径
+  // 鏂囦欢璺緞
   else {
     form.media = fs.createReadStream(material);
   }
@@ -381,9 +384,9 @@ Wechat.prototype.batchMaterial = function(options) {
   });
 };
 
-// 以下是用户管理
+// 浠ヤ笅鏄敤鎴风鐞�
 /**
- * 创建分组
+ * 鍒涘缓鍒嗙粍
  * @param name
  * @returns {*}
  */
@@ -423,7 +426,7 @@ Wechat.prototype.createGroup = function(name) {
 };
 
 /**
- * 得到分组
+ * 寰楀埌鍒嗙粍
  * @param name
  * @returns {*}
  */
@@ -455,7 +458,7 @@ Wechat.prototype.fetchGroups = function() {
 };
 
 /**
- * 查看在哪个分组
+ * 鏌ョ湅鍦ㄥ摢涓垎缁�
  * @param name
  * @returns {*}
  */
@@ -492,9 +495,9 @@ Wechat.prototype.checkGroup = function(openId) {
 };
 
 /**
- * 更新分组
- * @param id 分组id
- * @param name 分组名字
+ * 鏇存柊鍒嗙粍
+ * @param id 鍒嗙粍id
+ * @param name 鍒嗙粍鍚嶅瓧
  * @returns {*}
  */
 Wechat.prototype.updateGroup = function(id, name) {
@@ -533,9 +536,9 @@ Wechat.prototype.updateGroup = function(id, name) {
 };
 
 /**
- *  批量移动
- * @param openIds 用户id 单个或数组
- * @param groupId 分组id
+ *  鎵归噺绉诲姩
+ * @param openIds 鐢ㄦ埛id 鍗曚釜鎴栨暟缁�
+ * @param groupId 鍒嗙粍id
  * @returns {*}
  */
 Wechat.prototype.moveGroup = function(openIds, groupId) {
@@ -579,7 +582,7 @@ Wechat.prototype.moveGroup = function(openIds, groupId) {
 };
 
 /**
- * 删除分组
+ * 鍒犻櫎鍒嗙粍
  * @param id
  * @returns {*}
  */
@@ -653,7 +656,7 @@ Wechat.prototype.remarkUser = function(openId, remark) {
 };
 
 /**
- * 获取用户信息
+ * 鑾峰彇鐢ㄦ埛淇℃伅
  * @param openIds
  * @returns {*}
  */
@@ -697,7 +700,7 @@ Wechat.prototype.fetchUsers = function(openIds, lang) {
 };
 
 /**
- * 获取用户列表
+ * 鑾峰彇鐢ㄦ埛鍒楄〃
  * @param openId
  * @returns {*}
  */
@@ -731,7 +734,7 @@ Wechat.prototype.listUsers = function(openId) {
 };
 
 
-// 以下是发消息
+// 浠ヤ笅鏄彂娑堟伅
 /**
  *
  * @param type
@@ -780,6 +783,110 @@ Wechat.prototype.sendByGroup = function(type, message, groupId) {
                 reject(err);
               });
         });
+  });
+};
+
+
+Wechat.prototype.sendByOpenId = function(type, message, openIds) {
+  var that = this;
+  var msg = {
+    msgtype: type,
+    touser: openIds
+  };
+
+  msg[type] = message
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken()
+      .then(function (data) {
+        var url = api.mass.openId + 'access_token=' + data.access_token;
+
+        request({
+          method: 'POST',
+          body: msg,
+          url:url,
+          json: true
+        }).then(function(response) {
+          var _data = response.body;
+          if (_data) {
+            resolve(_data);
+          } else {
+            throw new Error('Send by openids fails');
+          }
+        })
+          .catch(function(err) {
+            reject(err);
+          });
+      });
+  });
+};
+
+Wechat.prototype.deleteMass = function(msgId) {
+  var that = this;
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken()
+      .then(function (data) {
+        var url = api.mass.del + 'access_token=' + data.access_token;
+
+        var form = {
+          msg_id: msgId
+        }
+
+        request({
+          method: 'POST',
+          body: form,
+          url:url,
+          json: true
+        }).then(function(response) {
+          var _data = response.body;
+          if (_data) {
+            resolve(_data);
+          } else {
+            throw new Error('Delete mass fails');
+          }
+        })
+          .catch(function(err) {
+            reject(err);
+          });
+      });
+  });
+};
+
+Wechat.prototype.previewMass = function(type, message, openId) {
+  var that = this;
+  var msg = {
+    msgtype: type,
+    touser: openIds
+  };
+
+  msg[type] = message
+
+  return new Promise(function(resolve, reject) {
+    that
+      .fetchAccessToken()
+      .then(function (data) {
+        var url = api.mass.preview + 'access_token=' + data.access_token;
+
+        request({
+          method: 'POST',
+          body: msg,
+          url:url,
+          json: true
+        }).then(function(response) {
+          var _data = response.body;
+          if (_data) {
+            resolve(_data);
+          } else {
+            throw new Error('Preview mass fails');
+          }
+        })
+          .catch(function(err) {
+            reject(err);
+          });
+      });
   });
 };
 module.exports = Wechat;

@@ -225,7 +225,9 @@ exports.reply = function* (next) {
             var mpnews = {
                 media_id: 'M50gNASgkWfAmCAruVMxxauKDbpcZXQXG-J4uxcZpGE'
             }
-            var text = 'Hello ayou';
+            var text = {
+                'content':'Hello ayou'
+            };
             var msgData = yield wechatApi.sendByGroup('mpnews', mpnews);
 
             console.log('msgData:');
