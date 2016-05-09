@@ -6,12 +6,12 @@
 
 var path = require('path');
 var util = require('./libs/util');
-var wechat_file = path.join(__dirname, './config/wechat.txt')
-
+var wechat_file = path.join(__dirname, './config/wechat.txt');
+var wechat_ticket_file = path.join(__dirname, './config/wechat_ticket.txt');
 var config = {
     wechat: {
-        appID: 'wx483e77141ca5699a',
-        appSecret: '540380f7f5915f6262c22526d8b2687c',
+        appID: 'wx26d08f3077dfca3e',
+        appSecret: '635b0889021346fd4d9e7a1380247fdd',
         token:'youxingzhi',
         getAccessToken: function() {
             return util.readFileAsync(wechat_file);
@@ -19,6 +19,13 @@ var config = {
         saveAccessToken: function(data) {
             data = JSON.stringify(data);
             return util.writeFileAsync(wechat_file,data);
+        },
+        getTicket: function() {
+            return util.readFileAsync(wechat_ticket_file);
+        },
+        saveTicket: function(data) {
+            data = JSON.stringify(data);
+            return util.writeFileAsync(wechat_ticket_file,data);
         }
     },
     url: 'http://xazkkj.eicp.net'

@@ -3,14 +3,29 @@
  */
 'use strict'
 
-var config = require('./config');
-var Wechat = require('./wechat/wechat');
+var config = require('../config');
+var Wechat = require('../wechat/wechat');
+var menu = require('./menu');
+var path = require('path');
 
 var wechatApi = new Wechat(config.wechat);
 
-exports.reply = function* (next) {
-    var message = this.weixin;
+//wechatApi.delMenu().then(function() {
+//   return wechatApi.createMenu(menu);
+//}).then(function(msg) {
+//   console.log(msg);
+//});
 
+wechatApi.delMenu().then(function() {
+    return wechatApi.createMenu(menu);
+}).then(function(msg) {
+    console.log(msg);
+});
+
+
+exports.reply = function* (next) {
+
+    var message = this.weixin;
     // 事件
     if (message.MsgType === 'event') {
         if (message.Event === 'subscribe') {
@@ -39,6 +54,40 @@ exports.reply = function* (next) {
         }
         else if (message.Event === 'VIEW') {
             this.body = '您点击了菜单中的链接：' + message.EventKey;// url地址
+        }
+        // 扫码推送事件
+        else if (message.Event === 'scancode_push') {
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanCodeInfo.ScanResult);
+            this.body = '您点击了菜单：' + message.EventKey;
+        }
+        else if (message.Event === 'scancode_waitmsg') {
+            console.log(message.ScanCodeInfo.ScanType);
+            console.log(message.ScanCodeInfo.ScanResult);
+            this.body = '您点击了菜单：' + message.EventKey;
+        }
+        else if (message.Event === 'pic_sysphoto') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = '您点击了菜单：' + message.EventKey;
+        }
+        else if (message.Event === 'pic_photo_or_album') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = '您点击了菜单：' + message.EventKey;
+        }
+        else if (message.Event === 'pic_weixin') {
+            console.log(message.SendPicsInfo.PicList);
+            console.log(message.SendPicsInfo.Count);
+            this.body = '您点击了菜单：' + message.EventKey;
+        }
+        else if (message.Event === 'location_select') {
+            console.log(message.SendLocationInfo.Location_X);
+            console.log(message.SendLocationInfo.Location_Y);
+            console.log(message.SendLocationInfo.Scale);
+            console.log(message.SendLocationInfo.Label);
+            console.log(message.SendLocationInfo.Poiname);
+            this.body = '您点击了菜单：' + message.EventKey;
         }
     }
     // 文本
@@ -233,6 +282,57 @@ exports.reply = function* (next) {
             console.log('msgData:');
             console.log(msgData);
             reply = 'Yeah!';
+        }
+        // 预览
+        else if (content === '16') {
+            //var mpnews = {
+            //    media_id: 'M50gNASgkWfAmCAruVMxxauKDbpcZXQXG-J4uxcZpGE'
+            //}
+            var text = {
+                'content':'Hello !'
+            };
+            var msgData = yield wechatApi.previewMass('text', text,'');// openid
+
+            console.log('msgData:');
+            console.log(msgData);
+            reply = 'Yeah!';
+        }
+        //
+        else if (content === '18') {
+            var tempQr = {
+                expire_seconds: 400000,
+                action_name: 'QR_SCENE',
+                action_info: {
+                    scene: {
+                        scene_id: 123
+                    }
+                }
+            };
+            var permQr = {
+                action_name: 'QR_LIMIT_SCENE',
+                action_info: {
+                    scene: {
+                        scene_id: 123
+                    }
+                }
+            };
+            var permStrQr = {
+                action_name: 'QR_LIMIT_STR_SCENE',
+                action_info: {
+                    scene: {
+                        scene_str: '123'
+                    }
+                }
+            };
+            var qr1 = yield wechatApi.createQrcode(tempQr);
+            var qr2 = yield wechatApi.createQrcode(permQr);
+            var qr3 = yield wechatApi.createQrcode(permStrQr);
+            var msgData = yield wechatApi
+        }
+        //
+        else if (content === '19'){
+            var longUrl = 'http://www.baidu.com';
+            var shortData = yield wechatApi.createShorturl(longUrl);
         }
         else if (content === '长沙') {
             reply = [
