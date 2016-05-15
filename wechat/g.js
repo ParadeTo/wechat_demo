@@ -21,7 +21,7 @@ module.exports = function(opts, handler) {
 
         var str = [token,ts,nonce].sort().join('');
         var sha = sha1(str);
-        console.log(this.method);
+
         if (this.method === 'GET') {
             if (sha === signature) {
                 this.body = echostr + '';
@@ -40,9 +40,7 @@ module.exports = function(opts, handler) {
                 encoding: this.charset
             });
             var content = yield util.parseXMLAsync(data);
-            console.log(content);
             var message = util.formatMessage(content.xml)
-            console.log(message);
 
             this.weixin = message;
 

@@ -7,6 +7,7 @@
 var ejs = require('ejs');
 var heredoc = require('heredoc');
 
+// <%- 不转义
 var tpl = heredoc(function() {/*
     <xml>
     <ToUserName><![CDATA[<%= toUserName %>]]></ToUserName>
@@ -14,7 +15,7 @@ var tpl = heredoc(function() {/*
     <CreateTime><%= createTime %></CreateTime>
     <MsgType><![CDATA[<%= msgType %>]]></MsgType>
     <% if (msgType === 'text')  { %>
-        <Content><![CDATA[<%= content%>]]></Content>
+        <Content><![CDATA[<%- content%>]]></Content>
     <%  } else if (msgType === 'image') { %>
          <Image>
             <MediaId><![CDATA[<%= content.mediaId %>]]></MediaId>

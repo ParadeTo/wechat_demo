@@ -111,10 +111,7 @@ Wechat.prototype.updateAccessToken = function() {
 Wechat.prototype.reply = function() {
   var content = this.body;
   var message = this.weixin;
-  console.log('body:'+content);
-  console.log('weixin:'+message);
   var xml = util.tpl(content, message);
-  console.log('xml:'+xml);
   this.status = 200;
   this.type = 'application/xml';
   this.body = xml;
@@ -206,9 +203,7 @@ Wechat.prototype.uploadMaterial = function(type, material, permanent) {
         else {
           options.formData = form
         }
-        console.log('type'+type);
-        console.log(url);
-        console.log(form);
+
         request(options).then(function(response) {
           var _data = response.body;
           if (_data) {

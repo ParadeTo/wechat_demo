@@ -7,6 +7,7 @@ var fs = require('fs');
 var Promise = require('bluebird');
 var xml2js = require('xml2js');
 var tpl = require('./tpl');
+var crypto = require('crypto');
 
 
 exports.readFileAsync = function(fpath, encoding) {
@@ -15,7 +16,6 @@ exports.readFileAsync = function(fpath, encoding) {
             if(err) {
                 reject(err);
             } else {
-                console.log(content);
                 resolve(content);
             }
         });
@@ -46,6 +46,11 @@ exports.parseXMLAsync = function(xml) {
     });
 };
 
+/**
+ * 格式化微信消息结构
+ * @param result
+ * @returns {{}}
+ */
 function formatMessage (result) {
     var message = {};
     if (typeof result === 'object') {
@@ -66,7 +71,7 @@ function formatMessage (result) {
                     message[key] = (val || '').trim();
                 }
             }
-            // value������
+            // value是对象
             else {
                 message[key] = [];
                 for (var j=0,k=item.length;j<k;j++) {
@@ -82,8 +87,8 @@ exports.formatMessage = formatMessage;
 
 /**
  *
- * @param content �ظ�����Ϣ����
- * @param message �õ�����Ϣ����
+ * @param content 发送给用户的内容
+ * @param message 用户发送过来的消息结构
  * @returns {*}
  */
 exports.tpl = function(content, message) {
@@ -96,7 +101,6 @@ exports.tpl = function(content, message) {
         type = 'news';
     }
 
-    console.log('content:'+content);
     type = content.type || type;
     info.content = content;
     info.createTime = new Date().getTime();
@@ -106,4 +110,47 @@ exports.tpl = function(content, message) {
 
     return tpl.compiled(info);
 };
+
+var createNonce = function () {
+    return Math.random().toString(36).substr(2, 15);
+};
+
+var createTimestamp = function () {
+    return parseInt(new Date().getTime() / 1000, 10) + '';
+};
+
+/**
+ * 可到http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=jsapisign
+ * 查看签名算法是否与微信官方一致
+ * @param noncestr
+ * @param ticket
+ * @param timestamp
+ * @param url 使用qq的调试工具时会加端口号，这是一个坑
+ * @returns {*}
+ * @private
+ */
+var _sign = function (noncestr, ticket, timestamp, url) {
+    var params = [
+        'noncestr=' + noncestr,
+        'jsapi_ticket=' + ticket,
+        'timestamp=' + timestamp,
+        'url=' + url
+    ];
+
+    var str = params.sort().join('&');
+    var shasum = crypto.createHash('sha1');
+    shasum.update(str);
+    return shasum.digest('hex');
+};
+
+exports.sign = function(ticket, url) {
+    var noncestr = createNonce();
+    var timestamp = createTimestamp();
+    var signature = _sign(noncestr, ticket, timestamp, url);
+    return {
+        noncestr: noncestr,
+        timestamp: timestamp,
+        signature: signature
+    };
+}
 
