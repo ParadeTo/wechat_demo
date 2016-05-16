@@ -38,10 +38,10 @@ module.exports = function(router) {
     //router.post('/admin/movie', User.signinRequired, User.adminRequired, Movie.savePoster, Movie.save)
     //router.get('/admin/movie/list', User.signinRequired, User.adminRequired, Movie.list)
     //router.delete('/admin/movie/list', User.signinRequired, User.adminRequired, Movie.del)
-    //
-    //// Comment
-    //router.post('/user/comment', User.signinRequired, Comment.save)
-    //
+
+    // Comment
+    router.post('/user/comment', User.signinRequired, Comment.save);
+
     //// Category
     //router.get('/admin/category/new', User.signinRequired, User.adminRequired, Category.new)
     //router.post('/admin/category', User.signinRequired, User.adminRequired, Category.save)

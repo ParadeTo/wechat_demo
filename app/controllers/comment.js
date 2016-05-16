@@ -1,3 +1,4 @@
+'use strict';
 var mongoose = require('mongoose')
 var Comment = mongoose.model('Comment')
 
@@ -18,10 +19,14 @@ exports.save = function* (next) {
 
         yield comment.save();
 
-        this.redirect('/movie/' + movieId);
+        this.body = {success:1};
     }
     else {
-        var comment = new Comment(_comment);
+        let comment = new Comment({
+            movie: _comment.movie,
+            from: _comment.from,
+            content: _comment.content
+        });
 
         yield comment.save();
 
