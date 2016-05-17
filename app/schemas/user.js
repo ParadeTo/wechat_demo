@@ -3,10 +3,12 @@ var mongoose = require('mongoose');
 var SALT_WORK_FACTOR = 10
 
 var UserSchema = new mongoose.Schema({
+  openid: String,
   name: {
     unique: true,
     type: String
   },
+  headimgurl: String,
   password: String,
   // 0: nomal user
   // 1: verified user
@@ -55,9 +57,11 @@ UserSchema.methods = {
   comparePassword: function(_password,password) {
     //win 下无法安装bcrypt
     if (_password === password) {
-      cb(null, true);
+      return true;
+      //cb(null, true);
     } else {
-      cb(null, false)
+      return false;
+      //cb(null, false)
     }
   }
   //  var password = this.password;

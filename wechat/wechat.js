@@ -669,7 +669,7 @@ Wechat.prototype.remarkUser = function(openId, remark) {
 };
 
 /**
- * 鑾峰彇鐢ㄦ埛淇℃伅
+ * 获取用户基本信息
  * @param openIds
  * @returns {*}
  */

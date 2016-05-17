@@ -16,6 +16,7 @@ module.exports = function(router) {
     // 微信相关路由
     router.get('/wechat/movie', Game.guess);
     router.get('/wechat/movie/:id', Game.find);
+    router.get('/wechat/jump/:id', Game.jump);
     router.get('/wx', Wechat.hear);
     router.post('/wx', Wechat.hear);
 

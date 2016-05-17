@@ -5,13 +5,12 @@ var Comment = mongoose.model('Comment')
 // comment
 exports.save = function* (next) {
     var _comment = this.request.body.comment;
-    var movieId = _comment.movie;
-
-    if (_comment.cid) {
-        var comment = yield Comment.findOne({_id: id}).exec();
+    var id = _comment.movie;
+    if (_comment.cId) {
+        var comment = yield Comment.findOne({_id: _comment.cId}).exec();
         var reply = {
             from: _comment.from,
-            to: _comment.tid,
+            to: _comment.tId,
             content: _comment.content
         };
 
@@ -29,7 +28,6 @@ exports.save = function* (next) {
         });
 
         yield comment.save();
-
-        this.redirect('/movie/' + movieId);
+        this.body = {success:1};
     }
 }

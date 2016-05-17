@@ -43,7 +43,7 @@ exports.signin = function* (next) {
         return next;
     }
 
-    var isMatch = yield user.comparePassword(password, user.password);
+    var isMatch = user.comparePassword(password, user.password);
 
     if (isMatch) {
         this.session.user = user

@@ -77,6 +77,7 @@ function updateMovies(movie) {
                 // TJ大神的库--co，可以让我们用同步的方式编写异步的代码
                 cateArray.push(function* () {
                     var cat = yield Category.findOne({name: genre}).exec();
+                    console.log(cat);
                     if (cat) {
                         cat.movies.push(movie._id)
                     }
@@ -85,10 +86,10 @@ function updateMovies(movie) {
                             name: genre,
                             movies: [movie._id]
                         });
-                        cat = yield cat.save();
-                        movie.category = cat._id
-                        yield movie.save();
                     }
+                    cat = yield cat.save();
+                    movie.category = cat._id
+                    yield movie.save();
                 });
             });
             co(function* () {
@@ -142,11 +143,29 @@ exports.searchByDouban = function* (q) {
         });
         yield queryArray;
         movies.forEach(function (movie) {
-            console.log('#########################');
-            console.log(movie);
             updateMovies(movie);
         });
 
     }
+    return movies;
+};
+
+exports.findHotMovies = function* (hot, count) {
+    var movies = yield Movie
+        .find({})
+        .sort({'pv': hot}) // 1 升序 -1 倒序
+        .limit(count)
+        .exec();
+    return movies;
+};
+
+exports.findMoviesByCate = function* (cat) {
+    var movies = yield Category
+        .findOne({name: cat})
+        .populate({
+            path : 'movies',
+            select: 'title poster _id'
+        })
+        .exec();
     return movies;
 };

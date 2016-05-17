@@ -120,7 +120,7 @@ var createTimestamp = function () {
 };
 
 /**
- * 可到http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=jsapisign
+ *  TODO 可到http://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=jsapisign
  * 查看签名算法是否与微信官方一致
  * @param noncestr
  * @param ticket
