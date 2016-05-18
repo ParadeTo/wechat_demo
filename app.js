@@ -51,14 +51,16 @@ var Router = require('koa-router');
 var session = require('koa-session');
 var bodyParser = require('koa-bodyparser');
 var router = new Router();
-var game = require('./app/controllers/game');
-var wechat = require('./app/controllers/wechat');
 var User = mongoose.model('User');
+var moment = require('moment');
 
 // 模板引擎
 var views = require('koa-views');
 app.use(views(__dirname + '/app/views', {
-    extension: 'jade'
+    extension: 'jade',
+    locals: {
+      moment: moment
+    }
 }));
 
 // session
