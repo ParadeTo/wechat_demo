@@ -5,6 +5,7 @@ var Category = mongoose.model('Category')
 var Comment = mongoose.model('Comment')
 var _ = require('lodash')
 var fs = require('fs')
+var util = require('../../libs/util')
 var path = require('path')
 
 // detail page
@@ -53,34 +54,33 @@ exports.update = function* (next) {
     }
 }
 
+
 // admin poster
-//exports.savePoster = function* (next) {
-//    var posterData = this.files.uploadPoster
-//    var filePath = posterData.path
-//    var originalFilename = posterData.originalFilename
-//
-//    if (originalFilename) {
-//        fs.readFile(filePath, function (err, data) {
-//            var timestamp = Date.now()
-//            var type = posterData.type.split('/')[1]
-//            var poster = timestamp + '.' + type
-//            var newPath = path.join(__dirname, '../../', '/public/upload/' + poster)
-//
-//            fs.writeFile(newPath, data, function (err) {
-//                req.poster = poster
-//                next()
-//            })
-//        })
-//    }
-//    else {
-//        next()
-//    }
-//}
+exports.savePoster = function* (next) {
+    var posterData = this.request.body.files.uploadPoster
+    var filePath = posterData.path
+    var name = posterData.name
+
+    if (name) {
+        var data = yield util.readFileAsync(filePath);
+        var timestamp = Date.now();
+        var type = posterData.type.split('/')[1];
+        var poster = timestamp + '.' + type;
+        var newPath = path.join(__dirname, '../../', '/public/upload/' + poster);
+
+        yield util.writeFileAsync(newPath, data);
+        this.poster = poster;
+
+    }
+    else {
+        yield next();
+    }
+}
 
 // admin post movie
 exports.save = function* (next) {
-    var id = this.request.body.movie._id
-    var movieObj = this.request.body.movie
+    var movieObj = this.request.body.fields || {};
+    var id = movieObj._id
     var _movie
 
     if (this.poster) {
