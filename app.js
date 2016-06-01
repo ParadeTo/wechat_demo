@@ -5,12 +5,14 @@
 
 var Koa = require('koa');
 var path = require('path');
+var koaStatic = require('koa-static');
 var fs = require('fs');
 var mongoose = require('mongoose');
 
 var dbUrl = 'mongodb://192.168.1.191/movie'
 
 mongoose.connect(dbUrl)
+
 
 // models loading
 var models_path = __dirname + '/app/models'
@@ -46,6 +48,9 @@ wechatApi.delMenu().then(function() {
 });
 
 var app = new Koa();
+
+// 静态文件
+app.use(koaStatic(__dirname + '/public'));
 
 var Router = require('koa-router');
 var session = require('koa-session');

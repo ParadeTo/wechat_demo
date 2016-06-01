@@ -1,1 +1,1 @@
-{"errcode":40001,"errmsg":"invalid credential, access_token is invalid or not latest hint: [yp57qa0684vr19]","expires_in":null}
+{"errcode":0,"errmsg":"ok","ticket":"kgt8ON7yVITDhtdwci0qeaP1seSmsQHblyTu_q4diN5Oknld4dnHgVJiLB2xkzl6UqnyRPLAhT738wsLf7cH4w","expires_in":1464800308495}

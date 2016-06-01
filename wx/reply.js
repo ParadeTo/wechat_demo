@@ -8,7 +8,7 @@ var Movie = require('../app/api/movie');
 var help = '亲爱的，欢迎关注电影世界\r\n' + '这是小包子的测试公众号！\r\n' +
     '回复首页，进入电影首页\r\n' +
     '回复登陆，进入微信登陆页面\r\n' +
-    //'回复游戏，进入游戏页面\r\n' +
+        //'回复游戏，进入游戏页面\r\n' +
     '回复电影名字，查询电影信息\r\n' +
     '回复语音，查询电影\r\n' +
     '也可以点击<a href="http://5xh1glu64e.proxy.qqbrowser.cc/movie">语音查电影</a>';
@@ -29,7 +29,7 @@ exports.reply = function* (next) {
         else if (message.Event === 'LOCATION') {
 
             this.body = '您在' + message.Latitude + '/' + message.Longitude + '-' +
-                message.Precision;
+            message.Precision;
         }
         else if (message.Event === 'CLICK') {
 
@@ -54,10 +54,10 @@ exports.reply = function* (next) {
                 }
             }
             else if (message.EventKey === 'help') {
-               news = help;
+                news = help;
             }
             if (movies) {
-                movies.forEach(function(movie) {
+                movies.forEach(function (movie) {
                     news.push({
                         title: movie.title,
                         description: movie.title,
@@ -80,7 +80,7 @@ exports.reply = function* (next) {
         }
         if (movies || movies.length > 0) {
             movies = movies.slice(0, 10);
-            movies.forEach(function(movie) {
+            movies.forEach(function (movie) {
                 reply.push({
                     title: movie.title,
                     description: movie.title,
@@ -122,6 +122,14 @@ exports.reply = function* (next) {
                     url: 'https://www.baidu.com'
                 }
             ];
+        }
+        else if (content.toLowerCase() === '哆啦a梦') {
+            reply = [{
+                title: '纯CSS哆啦A梦',
+                description: '进来看看',
+                picUrl: 'http://preview.quanjing.com/chineseview089/east-ep-a91-2195211.jpg',
+                url: 'https://www.baidu.com'
+            }];
         }
         else {
             var movies = yield Movie.searchByName(content);
