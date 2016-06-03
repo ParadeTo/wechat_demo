@@ -1,9 +1,12 @@
 body {
+    height: 100%;
     background: url('/images/wechat/dark_stripes.png') repeat;
 }
 
 .toggle {
-    margin: 4px;
+    margin-left: 50%;
+    margin-top: 50%;
+    transform: translateX(-50%) translateY(-50%);
     display: inline-block;
 }
 
@@ -63,7 +66,7 @@ body {
 .toggle input {
     opacity: 0;
     position: absolute;
-    cursor: pointer;
+    /*cursor: pointer;*/
     z-index: 1;
     height: 100%;
     width: 100%;
@@ -78,12 +81,6 @@ body {
     box-shadow: 0 15px 25px -4px rgba(0, 0, 0, 0.4), inset 0 -8px 25px -1px rgba(255, 255, 255, 0.9), 0 -10px 15px -1px rgba(255, 255, 255, 0.6), inset 0 8px 20px 0 rgba(0, 0, 0, 0.2), inset 0 0 5px 1px rgba(255, 255, 255, 0.6);
 }
 
-.toggle input:active ~ .play {
-    height: 19px;
-    width: 19px;
-    border: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-}
 .toggle input:checked ~ .label .play {
     height: 19px;
     width: 19px;

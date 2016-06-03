@@ -7,6 +7,7 @@ var wx = require('../../wx/index');
 var util = require('../../libs/util');
 var Movie = require('../api/movie');
 var koa_request = require('koa-request');
+var _ = require('lodash');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var Comment = mongoose.model('Comment');
@@ -21,6 +22,7 @@ exports.guess = function* (next) {
     //使用qq的调试工具时会加端口号，这是一个坑
     var url = this.href.replace(':8000', '');
     var params = util.sign(ticket, url);
+    params = _.extend(params,{title:"查电影"});
     yield this.render('wechat/game', params);
 };
 /**
