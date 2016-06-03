@@ -4,17 +4,25 @@ append css
 	link(rel="stylesheet", href="/stylesheets/wechat/game.css")
 
 block content
-	.toggle
-		input(type="checkbox")#record
-		span.button
-		span.label
-			.play
+	.toggle-container
+		.toggle
+			input(type="checkbox")#record
+			span.button
+			span.label
+				.play
 
-	h1#search
-	p#title
-	#director
-	#year
-	#poster
+	#res
+		h2 查询结果
+		span 小妹纸
+
+	.movie
+		#poster
+			img(src="/images/cs/1.jpg")
+		.info
+			h3#title 大框架
+			h3#director 大框架
+			h3#year 1992
+		.summary 的萨克管监控四大金刚卡数据东莞
 
 	script.
 		// 弹窗
@@ -95,7 +103,7 @@ block content
 							isShowProgressTips: 1, // 默认为1，显示进度提示
 							success: function (res) {
 								var result = res.translateResult;
-								$('#search').html('查询:').append(result); // 语音识别的结果
+								$('#res').html('<h2>语言解析结果：</h2>'+ result); // 语音识别的结果
 								// 开启移动调试后，向豆瓣发送的请求会失败
 								$.ajax({
 									type: 'get',

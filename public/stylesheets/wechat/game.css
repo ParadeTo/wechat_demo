@@ -1,11 +1,24 @@
 body {
     height: 100%;
     background: url('/images/wechat/dark_stripes.png') repeat;
+    color: white;
+    font-family: "Microsoft YaHei";
+    padding: 0 10px 0 10px;
+}
+
+h2 {
+    font-size: 16px;
+}
+
+.toggle-container {
+    width: 100%;
+    height: 300px;
+    position: relative;
 }
 
 .toggle {
     margin-left: 50%;
-    margin-top: 50%;
+    margin-top: 40%;
     transform: translateX(-50%) translateY(-50%);
     display: inline-block;
 }
@@ -18,6 +31,7 @@ body {
     height: 140px;
     width: 140px;
 }
+
 .toggle:before {
     box-shadow: 0 0 17.5px 8.75px white;
     border-radius: 118.3px;
@@ -32,6 +46,7 @@ body {
     left: 50%;
     top: 50%;
 }
+
 .toggle .button {
     -webkit-filter: blur(1px);
     -moz-filter: blur(1px);
@@ -49,6 +64,7 @@ body {
     left: 50%;
     top: 50%;
 }
+
 .toggle .label {
     transition: color 300ms ease-out;
     text-shadow: 1px 1px 3px #ccd0d4, 0 0 0 rgba(0, 0, 0, 0.8), 1px 1px 4px white;
@@ -63,6 +79,7 @@ body {
     width: 100%;
     color: rgba(0, 0, 0, 0.4);
 }
+
 .toggle input {
     opacity: 0;
     position: absolute;
@@ -73,6 +90,7 @@ body {
     left: 0;
     top: 0;
 }
+
 .toggle input:active ~ .button {
     box-shadow: 0 15px 25px -4px rgba(0, 0, 0, 0.4), inset 0 -8px 30px 1px rgba(255, 255, 255, 0.9), 0 -10px 15px -1px rgba(255, 255, 255, 0.6), inset 0 8px 25px 0 rgba(0, 0, 0, 0.4), inset 0 0 10px 1px rgba(255, 255, 255, 0.6);
 }
@@ -98,6 +116,16 @@ body {
     border-right: 0 solid transparent;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
-    border-left: 20px solid  rgba(0,0,0,0.6);
-    box-shadow:1px 1px 3px #ccd0d4, 0 0 0 rgba(0, 0, 0, 0.8);
+    border-left: 20px solid rgba(0, 0, 0, 0.6);
+    box-shadow: 1px 1px 3px #ccd0d4, 0 0 0 rgba(0, 0, 0, 0.8);
+}
+
+/*海报*/
+#poster {
+    float: left;
+}
+
+#poster img {
+    width: 200px;
+    height: 300px;
 }
