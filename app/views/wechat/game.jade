@@ -4,150 +4,54 @@ append css
 	link(rel="stylesheet", href="/stylesheets/wechat/game.css")
 
 block content
-	.toggle-container
-		.toggle
-			input(type="checkbox")#record
-			span.button
-			span.label
-				.play
+	.page-group
+		.content.infinite-scroll.infinite-scroll-bottom
+			.bar.bar-standard.bar-footer.bar-big.bar-fix
+				a#recordBtn.button.button-big.button-fill.button-success(href="#") 点击录音，查询电影
 
-	#res
-		h2 查询结果
-		span 小妹纸
+			.card
+				.card-header.color-white.no-border.no-padding
+					img#img(src="https://img1.doubanio.com/view/movie_poster_cover/ipst/public/p1597238857.jpg")
+				.card-content
+					.list-block
+						ul
+							li.h-center#title X战警：天启 X-Men: Apocalypse
+							li
+								.item-content
+									.item-inner
+										.item-title.label 导演
+										.item-input#director 布莱恩·辛格
 
-	.movie
-		#poster
-			img(src="/images/cs/1.jpg")
-		.info
-			h3#title 大框架
-			h3#director 大框架
-			h3#year 1992
-		.summary 的萨克管监控四大金刚卡数据东莞
+							li
+								.item-content
+									.item-inner
+										.item-title.label 编剧
+										.item-input#screenwriter 布莱恩·辛格 / 迈克尔·道赫蒂 / 丹·哈里斯 / 西蒙·金伯格
 
-	script.
-		// 弹窗
-		window.onload=function() {
-			setTimeout(function(){
-								alert('点击按钮录音，再次点击结束');
-							},1000);
-		};
-		// 异步配置
-		wx.config({
-			debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-			appId: 'wx26d08f3077dfca3e', // 必填，公众号的唯一标识
-			timestamp: '#{timestamp}', // 必填，生成签名的时间戳
-			nonceStr: '#{noncestr}', // 必填，生成签名的随机串
-			signature: '#{signature}',// 必填，签名，见附录1
-			jsApiList: [
-				'previewImage',
-				'onMenuShareTimeline',
-				'onMenuShareAppMessage',
-				'onMenuShareQQ',
-				'onMenuShareWeibo',
-				'onMenuShareQZone',
-				'startRecord',
-				'stopRecord',
-				'onVoiceRecordEnd',
-				'translateVoice'
-			] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
-		});
-		wx.ready(function () {
-			// 分享给好友
-			var shareContent = {
-				title: '默认标题', // 分享标题
-				desc: '我搜出来了个鬼', // 分享描述
-				link: 'https://www.baidu.com', // 分享链接
-				imgUrl: '#', // 分享图标
-				success: function () {
-					window.alert('分享成功');
-				},
-				cancel: function () {
-					window.alert('分享失败');
-				}
-			}
-			wx.onMenuShareAppMessage(shareContent);
-			wx.checkJsApi({
-				jsApiList: ['onVoiceRecordEnd'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
-				success: function (res) {
-					console.log('result:');
-					console.log(res);
-					// 以键值对的形式返回，可用的api值true，不可用为false
-					// 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
-				}
-			});
-			var slides = null;
-			// 点击poster
-			$('#poster').on('tap', function () {
-				wx.previewImage(slides);
-			});
-			// 点击标题
-			var isRecording = false;
-			$('#record').on('tap', function () {
+							li
+								.item-content
+									.item-inner
+										.item-title.label 主演
+										.item-input#cast 詹姆斯·麦卡沃伊 / 迈克尔·法斯宾德 / 詹妮弗·劳伦斯
 
-				if (!isRecording) {
-					isRecording = true;
-					wx.startRecord({
-						cancel: function () {
-							window.alert('那就不能搜了哦');
-						}
-					});
-					return;
-				}
-				// 再次点击，停止录音
-				isRecording = false;
-				wx.stopRecord({
-					success: function (res) {
-						var localId = res.localId;
-						wx.translateVoice({
-							localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
-							isShowProgressTips: 1, // 默认为1，显示进度提示
-							success: function (res) {
-								var result = res.translateResult;
-								$('#res').html('<h2>语言解析结果：</h2>'+ result); // 语音识别的结果
-								// 开启移动调试后，向豆瓣发送的请求会失败
-								$.ajax({
-									type: 'get',
-									url: 'https://api.douban.com/v2/movie/search?q=' + result,
-									dataType: 'jsonp',
-									jsonp: 'callback',
-									success: function (data) {
-										//alert(data)
-										var subject = data.subjects[0];
-										$('#title').html(subject.title);
-										$('#director').html(subject.directors[0].name);
-										$('#poster').html('<img src="' + subject.images.large + '"/>');
-										$('#year').html(subject.year);
-										alert('点击海报查看更多哦');
-										shareContent = {
-											title: subject.title, // 分享标题
-											desc: '我搜出来了' + subject.title, // 分享描述
-											link: 'http://5xh1glu64e.proxy.qqbrowser.cc/movie', // 分享链接
-											imgUrl: subject.images.small, // 分享图标
-											type: 'link', // 分享类型,music、video或link，不填默认为link
-											dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
-											success: function () {
-												window.alert('分享成功');
-											},
-											cancel: function () {
-												window.alert('分享失败');
-											}
-										}
-										wx.onMenuShareAppMessage(shareContent);
-										slides = {
-											current: subject.images.large,
-											urls: [subject.images.large]
-										};
-										data.subjects.forEach(function (item) {
-											slides.urls.push(item.images.large);
-										});
-									},
-									error: function (err) {
-									}
-								});
-								//alert(res.translateResult); // 语音识别的结果
-							}
-						});
-					}
-				});
-			});
-		});
+							li
+								.item-content
+									.item-inner
+										.item-title.label 类型
+										.item-input#type 动作 / 科幻 / 奇幻 / 冒险
+
+							li
+								.item-content
+									.item-inner
+										.item-title.label 年份
+										.item-input#year 1992
+
+							li
+								.item-content
+									.item-inner
+										.item-title.label 评分
+										.item-input#score 8.7
+
+
+	script(src="/")
+

@@ -4,12 +4,11 @@
 'use strict'
 
 var Koa = require('koa');
-var path = require('path');
 var koaStatic = require('koa-static');
 var fs = require('fs');
 var mongoose = require('mongoose');
 
-var dbUrl = 'mongodb://192.168.1.191/movie'
+var dbUrl = 'mongodb://192.168.1.181/movie'
 
 mongoose.connect(dbUrl)
 
