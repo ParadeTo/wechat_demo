@@ -1,145 +1,256 @@
 /**
  * Created by ayou on 2016-06-04.
  */
-var WX = {
-  config: function() {
-    // Òì²½ÅäÖÃ
-    wx.config({
-      debug: false, // ¿ªÆôµ÷ÊÔÄ£Ê½,µ÷ÓÃµÄËùÓÐapiµÄ·µ»ØÖµ»áÔÚ¿Í»§¶Ëalert³öÀ´£¬ÈôÒª²é¿´´«ÈëµÄ²ÎÊý£¬¿ÉÒÔÔÚpc¶Ë´ò¿ª£¬²ÎÊýÐÅÏ¢»áÍ¨¹ýlog´ò³ö£¬½öÔÚpc¶ËÊ±²Å»á´òÓ¡¡£
-      appId: 'wx26d08f3077dfca3e', // ±ØÌî£¬¹«ÖÚºÅµÄÎ¨Ò»±êÊ¶
-      timestamp: '#{timestamp}', // ±ØÌî£¬Éú³ÉÇ©ÃûµÄÊ±¼ä´Á
-      nonceStr: '#{noncestr}', // ±ØÌî£¬Éú³ÉÇ©ÃûµÄËæ»ú´®
-      signature: '#{signature}',// ±ØÌî£¬Ç©Ãû£¬¼û¸½Â¼1
-      jsApiList: [
-        'previewImage',
-        'onMenuShareTimeline',
-        'onMenuShareAppMessage',
-        'onMenuShareQQ',
-        'onMenuShareWeibo',
-        'onMenuShareQZone',
-        'startRecord',
-        'stopRecord',
-        'onVoiceRecordEnd',
-        'translateVoice'
-      ] // ±ØÌî£¬ÐèÒªÊ¹ÓÃµÄJS½Ó¿ÚÁÐ±í£¬ËùÓÐJS½Ó¿ÚÁÐ±í¼û¸½Â¼2
+var query = '';
+    start = 0,
+    count = 5;
+/**
+ * ç‚¹å‡»åŠ è½½
+ */
+function clickLoad() {
+    $(document).on('tap','.more', function() {
+        console.log(1);
+        fetchMovies(query, start, count).then(addItems);
     });
-  },
-  ready: function() {
-    
-  }
 }
 
+/**
+ * æŸ¥è¯¢ç”µå½±
+ * @param q
+ * @param start
+ * @param end
+ */
+function fetchMovies(q, start, count) {
+    var defer = $.Deferred();
+    // å¼€å¯ç§»åŠ¨è°ƒè¯•åŽï¼Œå‘è±†ç“£å‘é€çš„è¯·æ±‚ä¼šå¤±è´¥
+    $.ajax({
+        type: 'get',
+        url: 'https://api.douban.com/v2/movie/search?q=' + q + '&start=' + start + '&count=' + count,
+        dataType: 'jsonp',
+        jsonp: 'callback',
+        success: function(data) {
+            defer.resolve(data);
+        },
+        error: defer.reject
+    })
+    return defer.promise();
+}
 
-$(function(){
-  function fetchMovies(q, start, count) {
-
-  }
-
-  var wx = {
-
-  }
-
-  wx.ready(function () {
-    // ·ÖÏí¸øºÃÓÑ
-    var shareContent = {
-      title: 'Ä¬ÈÏ±êÌâ', // ·ÖÏí±êÌâ
-      desc: 'ÎÒËÑ³öÀ´ÁË¸ö¹í', // ·ÖÏíÃèÊö
-      link: 'https://www.baidu.com', // ·ÖÏíÁ´½Ó
-      imgUrl: '#', // ·ÖÏíÍ¼±ê
-      success: function () {
-        window.alert('·ÖÏí³É¹¦');
-      },
-      cancel: function () {
-        window.alert('·ÖÏíÊ§°Ü');
-      }
-    }
-    wx.onMenuShareAppMessage(shareContent);
-    wx.checkJsApi({
-      jsApiList: ['onVoiceRecordEnd'], // ÐèÒª¼ì²âµÄJS½Ó¿ÚÁÐ±í£¬ËùÓÐJS½Ó¿ÚÁÐ±í¼û¸½Â¼2,
-      success: function (res) {
-        console.log('result:');
-        console.log(res);
-        // ÒÔ¼üÖµ¶ÔµÄÐÎÊ½·µ»Ø£¬¿ÉÓÃµÄapiÖµtrue£¬²»¿ÉÓÃÎªfalse
-        // Èç£º{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
-      }
-    });
-    /*var slides = null;
-     // µã»÷poster
-     $('#poster').on('tap', function () {
-     wx.previewImage(slides);
-     });*/
-    // µã»÷Â¼Òô
-    var isRecording = false;
-    $('#recordBtn').on('tap', function () {
-
-      if (!isRecording) {
-        isRecording = true;
-        wx.startRecord({
-          cancel: function () {
-            window.alert('ÄÇ¾Í²»ÄÜËÑÁËÅ¶');
-          }
+/**
+ * å¢žåŠ å…ƒç´ 
+ * @param data
+ */
+function addItems(data) {
+    var defer = $.Deferred();
+    var movies = data.subjects;
+    var html = '';
+    if(movies.length > 0) {
+        start += count;
+        movies.forEach(function(item){
+            html += '<div class="card">';
+            html += '<div class="card-header color-white no-border no-padding">';
+            html += '<img id="img" src="' + item.images.large  + '">';
+            html += '</div>';
+            html += '<div class="card-content">';
+            html += '<div class="list-block">';
+            html += '<ul>';
+            html += '<li id="title" class="h-center">' + item.title + '</li>';
+            html += '<li>';
+            html += '<div class="item-content">';
+            html += '<div class="item-inner">';
+            html += '<div class="item-title label">å¯¼æ¼”</div>';
+            html += '<div id="director" class="item-input">';
+            var directors = [];
+            item.directors.forEach(function(d) {
+               directors.push(d.name);
+            });
+            html += directors.join('/');
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</li>';
+            html += '<li>';
+            html += '<div class="item-content">';
+            html += '<div class="item-inner">';
+            html += '<div class="item-title label">ä¸»æ¼”</div>';
+            html += '<div id="cast" class="item-input">';
+            var casts = [];
+            item.casts.forEach(function(c) {
+                casts.push(c.name);
+            });
+            html += casts.join('/');
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</li>';
+            html += '<li>';
+            html += '<div class="item-content">';
+            html += '<div class="item-inner">';
+            html += '<div class="item-title label">ç±»åž‹</div>';
+            html += '<div id="type" class="item-input">' + item.genres.join('/') + '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</li>';
+            html += '<li>';
+            html += '<div class="item-content">';
+            html += '<div class="item-inner">';
+            html += '<div class="item-title label">å¹´ä»½</div>';
+            html += '<div id="year" class="item-input">' + item.year + '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</li>';
+            html += '<li>';
+            html += '<div class="item-content">';
+            html += '<div class="item-inner">';
+            html += '<div class="item-title label">è¯„åˆ†</div>';
+            html += '<div id="score" class="item-input">' + item.rating.average + '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</li>';
+            html += '</ul>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
         });
-        return;
-      }
-      // ÔÙ´Îµã»÷£¬Í£Ö¹Â¼Òô
-      isRecording = false;
-      wx.stopRecord({
-        success: function (res) {
-          var localId = res.localId;
-          wx.translateVoice({
-            localId: localId, // ÐèÒªÊ¶±ðµÄÒôÆµµÄ±¾µØId£¬ÓÉÂ¼ÒôÏà¹Ø½Ó¿Ú»ñµÃ
-            isShowProgressTips: 1, // Ä¬ÈÏÎª1£¬ÏÔÊ¾½ø¶ÈÌáÊ¾
-            success: function (res) {
-              var result = res.translateResult;
-              // ÓïÒôÊ¶±ð½á¹û
-              $.alert('ÓïÒô½âÎö½á¹û£º'+result);
-              // ¿ªÆôÒÆ¶¯µ÷ÊÔºó£¬Ïò¶¹°ê·¢ËÍµÄÇëÇó»áÊ§°Ü
-              $.ajax({
-                type: 'get',
-                url: 'https://api.douban.com/v2/movie/search?q=' + result,
-                dataType: 'jsonp',
-                jsonp: 'callback',
-                success: function (data) {
-                  var subject = data.subjects[0];
-                  // ¸³Öµ
-                  $('#title').html(subject.title);
-                  $('#director').html(subject.directors[0].name);
-                  $('#poster').html('<img src="' + subject.images.large + '"/>');
-                  $('#year').html(subject.year);
-                  alert('µã»÷º£±¨²é¿´¸ü¶àÅ¶');
-                  shareContent = {
-                    title: subject.title, // ·ÖÏí±êÌâ
-                    desc: 'ÎÒËÑ³öÀ´ÁË' + subject.title, // ·ÖÏíÃèÊö
-                    link: 'http://5xh1glu64e.proxy.qqbrowser.cc/movie', // ·ÖÏíÁ´½Ó
-                    imgUrl: subject.images.small, // ·ÖÏíÍ¼±ê
-                    type: 'link', // ·ÖÏíÀàÐÍ,music¡¢video»òlink£¬²»ÌîÄ¬ÈÏÎªlink
-                    dataUrl: '', // Èç¹ûtypeÊÇmusic»òvideo£¬ÔòÒªÌá¹©Êý¾ÝÁ´½Ó£¬Ä¬ÈÏÎª¿Õ
-                    success: function () {
-                      window.alert('·ÖÏí³É¹¦');
-                    },
-                    cancel: function () {
-                      window.alert('·ÖÏíÊ§°Ü');
-                    }
-                  }
-                  wx.onMenuShareAppMessage(shareContent);
-                  slides = {
-                    current: subject.images.large,
-                    urls: [subject.images.large]
-                  };
-                  data.subjects.forEach(function (item) {
-                    slides.urls.push(item.images.large);
-                  });
-                },
-                error: function (err) {
-                }
-              });
-              //alert(res.translateResult); // ÓïÒôÊ¶±ðµÄ½á¹û
-            }
-          });
+    }
+    $('#list').append(html);
+    if (movies.length < 5) {
+        $('.infinite-scroll-preloader').remove();
+    }
+    defer.resolve();
+    return defer.promise();
+}
+
+/**
+ * åˆ†äº«
+ * @param movie
+ */
+function share(shareContent) {
+    //_shareContent = {
+    //    title: movie.title, // åˆ†äº«æ ‡é¢˜
+    //    desc: 'æˆ‘æœå‡ºæ¥äº†' + movie.title, // åˆ†äº«æè¿°
+    //    link: 'http://5xh1glu64e.proxy.qqbrowser.cc/movie', // åˆ†äº«é“¾æŽ¥
+    //    imgUrl: movie.images.small, // åˆ†äº«å›¾æ ‡
+    //    type: 'link', // åˆ†äº«ç±»åž‹,musicã€videoæˆ–linkï¼Œä¸å¡«é»˜è®¤ä¸ºlink
+    //    dataUrl: '', // å¦‚æžœtypeæ˜¯musicæˆ–videoï¼Œåˆ™è¦æä¾›æ•°æ®é“¾æŽ¥ï¼Œé»˜è®¤ä¸ºç©º
+    //    success: function () {
+    //        $.alert('åˆ†äº«æˆåŠŸ');
+    //    },
+    //    cancel: function () {
+    //        $.alert('åˆ†äº«å¤±è´¥');
+    //    }
+    //}
+    var _shareContent = {
+        title: 'é»˜è®¤æ ‡é¢˜', // åˆ†äº«æ ‡é¢˜
+        desc: 'æˆ‘æœå‡ºæ¥äº†ä¸ªé¬¼', // åˆ†äº«æè¿°
+        link: '', // åˆ†äº«é“¾æŽ¥
+        imgUrl: '#', // åˆ†äº«å›¾æ ‡
+        success: function () {
+            window.alert('åˆ†äº«æˆåŠŸ');
+        },
+        cancel: function () {
+            window.alert('åˆ†äº«å¤±è´¥');
         }
-      });
+    };
+    _shareContent = $.extend(_shareContent, shareContent);
+    wx.onMenuShareAppMessage(_shareContent);
+}
+
+/**
+ * å¾®ä¿¡æŽ¥å£é…ç½®
+ */
+function wxConfig() {
+    wx.config({
+        debug: false, // å¼€å¯è°ƒè¯•æ¨¡å¼,è°ƒç”¨çš„æ‰€æœ‰apiçš„è¿”å›žå€¼ä¼šåœ¨å®¢æˆ·ç«¯alertå‡ºæ¥ï¼Œè‹¥è¦æŸ¥çœ‹ä¼ å…¥çš„å‚æ•°ï¼Œå¯ä»¥åœ¨pcç«¯æ‰“å¼€ï¼Œå‚æ•°ä¿¡æ¯ä¼šé€šè¿‡logæ‰“å‡ºï¼Œä»…åœ¨pcç«¯æ—¶æ‰ä¼šæ‰“å°ã€‚
+        appId: 'wx26d08f3077dfca3e', // å¿…å¡«ï¼Œå…¬ä¼—å·çš„å”¯ä¸€æ ‡è¯†
+        timestamp: '#{timestamp}', // å¿…å¡«ï¼Œç”Ÿæˆç­¾åçš„æ—¶é—´æˆ³
+        nonceStr: '#{noncestr}', // å¿…å¡«ï¼Œç”Ÿæˆç­¾åçš„éšæœºä¸²
+        signature: '#{signature}',// å¿…å¡«ï¼Œç­¾åï¼Œè§é™„å½•1
+        jsApiList: [
+            'previewImage',
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone',
+            'startRecord',
+            'stopRecord',
+            'onVoiceRecordEnd',
+            'translateVoice'
+        ] // å¿…å¡«ï¼Œéœ€è¦ä½¿ç”¨çš„JSæŽ¥å£åˆ—è¡¨ï¼Œæ‰€æœ‰JSæŽ¥å£åˆ—è¡¨è§é™„å½•2
     });
-  });
+}
+
+/**
+ * wxæŽ¥å£readyåŽ
+ * @returns {*}
+ */
+function wxReady() {
+    var defer = $.Deferred();
+    wx.ready(defer.resolve);
+    return defer.promise();
+}
+
+/**
+ * ç‚¹å‡»å½•éŸ³
+ */
+function clickRecord() {
+    var defer = $.Deferred();
+    $('#recordBtn').on('tap', function() {
+        console.log(1);
+        var $this = $(this);
+        // æ˜¯å¦åœ¨å½•éŸ³
+        if (!$this.hasClass('recording')) {
+            $this.addClass('recording');
+            wx.startRecord({
+                cancel: function () {
+                    window.alert('é‚£å°±ä¸èƒ½æœäº†å“¦');
+                }
+            });
+            return;
+        }
+        // å†æ¬¡ç‚¹å‡»ï¼Œåœæ­¢å½•éŸ³
+        $this.removeClass('recording');
+        wx.stopRecord({
+            success: function (res) {
+                var localId = res.localId;
+                console.log('localId'+localId);
+                defer.resolve(localId);
+            }
+        });
+    });
+    return defer.promise();
+}
+
+/**
+ * å¾®ä¿¡ç¿»è¯‘æŽ¥å£
+ * @param localId
+ */
+function wxTranslate(localId) {
+    var defer = $.Deferred();
+    wx.translateVoice({
+        localId: localId, // éœ€è¦è¯†åˆ«çš„éŸ³é¢‘çš„æœ¬åœ°Idï¼Œç”±å½•éŸ³ç›¸å…³æŽ¥å£èŽ·å¾—
+        isShowProgressTips: 1, // é»˜è®¤ä¸º1ï¼Œæ˜¾ç¤ºè¿›åº¦æç¤º
+        success: function (res) {
+            var result = res.translateResult;
+            // è¯­éŸ³è¯†åˆ«ç»“æžœ
+            $.alert('è¯­éŸ³è§£æžç»“æžœï¼š' + result);
+
+            resolve(result);
+        }
+    });
+    return defer.promise();
+}
+
+$(function () {
 
 
-})();
+    //query = 'åŠŸå¤«ç†ŠçŒ«';
+    //fetchMovies(query,start,count).then(addItems).then(()=>{$('.infinite-scroll-preloader').show()});
+    wxConfig();
+    wxReady().then(clickRecord);
+    clickLoad();
+
+});
+
+

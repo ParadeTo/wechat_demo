@@ -5,53 +5,15 @@ append css
 
 block content
 	.page-group
-		.content.infinite-scroll.infinite-scroll-bottom
+		.content.infinite-scroll.infinite-scroll-bottom(data-distance="200")
 			.bar.bar-standard.bar-footer.bar-big.bar-fix
 				a#recordBtn.button.button-big.button-fill.button-success(href="#") 点击录音，查询电影
+			#list
 
-			.card
-				.card-header.color-white.no-border.no-padding
-					img#img(src="https://img1.doubanio.com/view/movie_poster_cover/ipst/public/p1597238857.jpg")
-				.card-content
-					.list-block
-						ul
-							li.h-center#title X战警：天启 X-Men: Apocalypse
-							li
-								.item-content
-									.item-inner
-										.item-title.label 导演
-										.item-input#director 布莱恩·辛格
+			.infinite-scroll-preloader(style="display:none")
+				.more more
 
-							li
-								.item-content
-									.item-inner
-										.item-title.label 编剧
-										.item-input#screenwriter 布莱恩·辛格 / 迈克尔·道赫蒂 / 丹·哈里斯 / 西蒙·金伯格
-
-							li
-								.item-content
-									.item-inner
-										.item-title.label 主演
-										.item-input#cast 詹姆斯·麦卡沃伊 / 迈克尔·法斯宾德 / 詹妮弗·劳伦斯
-
-							li
-								.item-content
-									.item-inner
-										.item-title.label 类型
-										.item-input#type 动作 / 科幻 / 奇幻 / 冒险
-
-							li
-								.item-content
-									.item-inner
-										.item-title.label 年份
-										.item-input#year 1992
-
-							li
-								.item-content
-									.item-inner
-										.item-title.label 评分
-										.item-input#score 8.7
-
-
-	script(src="/")
+	script(src="/js/lib/zepto.callbacks.js")
+	script(src="/js/lib/zepto.deferred.js")
+	script(src="/js/wechat/game.js")
 

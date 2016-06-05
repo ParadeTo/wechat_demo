@@ -8,7 +8,7 @@ var koaStatic = require('koa-static');
 var fs = require('fs');
 var mongoose = require('mongoose');
 
-var dbUrl = 'mongodb://192.168.1.181/movie'
+var dbUrl = 'mongodb://192.168.1.191/movie'
 
 mongoose.connect(dbUrl)
 
@@ -49,6 +49,7 @@ wechatApi.delMenu().then(function() {
 var app = new Koa();
 
 // 静态文件
+app.use(koaStatic(__dirname + '/bower_components'));
 app.use(koaStatic(__dirname + '/public'));
 
 var Router = require('koa-router');
