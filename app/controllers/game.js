@@ -22,6 +22,7 @@ exports.guess = function* (next) {
     //使用qq的调试工具时会加端口号，这是一个坑
     var url = this.href.replace(':8000', '');
     var params = util.sign(ticket, url);
+
     params = _.extend(params,{title:"查电影"});
     yield this.render('wechat/game', params);
 };

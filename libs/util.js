@@ -147,6 +147,7 @@ exports.sign = function(ticket, url) {
     var noncestr = createNonce();
     var timestamp = createTimestamp();
     var signature = _sign(noncestr, ticket, timestamp, url);
+
     return {
         noncestr: noncestr,
         timestamp: timestamp,

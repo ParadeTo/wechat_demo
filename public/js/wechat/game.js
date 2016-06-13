@@ -10,7 +10,7 @@ var query = '';
 function clickLoad() {
     $(document).on('tap','.more', function() {
         console.log(1);
-        fetchMovies(query, start, count).then(addItems);
+        fetchMovies(query).then(addItems);
     });
 }
 
@@ -20,7 +20,7 @@ function clickLoad() {
  * @param start
  * @param end
  */
-function fetchMovies(q, start, count) {
+function fetchMovies(q) {
     var defer = $.Deferred();
     // 开启移动调试后，向豆瓣发送的请求会失败
     $.ajax({
@@ -29,6 +29,7 @@ function fetchMovies(q, start, count) {
         dataType: 'jsonp',
         jsonp: 'callback',
         success: function(data) {
+            alert(data);
             defer.resolve(data);
         },
         error: defer.reject
@@ -43,6 +44,7 @@ function fetchMovies(q, start, count) {
 function addItems(data) {
     var defer = $.Deferred();
     var movies = data.subjects;
+    alert(movies.length);
     var html = '';
     if(movies.length > 0) {
         start += count;
@@ -163,9 +165,9 @@ function wxConfig() {
     wx.config({
         debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: 'wx26d08f3077dfca3e', // 必填，公众号的唯一标识
-        timestamp: '#{timestamp}', // 必填，生成签名的时间戳
-        nonceStr: '#{noncestr}', // 必填，生成签名的随机串
-        signature: '#{signature}',// 必填，签名，见附录1
+        timestamp: $('#timestamp').val(), // 必填，生成签名的时间戳
+        nonceStr: $('#noncestr').val(), // 必填，生成签名的随机串
+        signature: $('#signature').val(),// 必填，签名，见附录1
         jsApiList: [
             'previewImage',
             'onMenuShareTimeline',
@@ -185,10 +187,10 @@ function wxConfig() {
  * wx接口ready后
  * @returns {*}
  */
-function wxReady() {
-    var defer = $.Deferred();
-    wx.ready(defer.resolve);
-    return defer.promise();
+function wxReady(callback) {
+    //var defer = $.Deferred();
+    wx.ready(callback);
+    //return defer.promise();
 }
 
 /**
@@ -196,11 +198,13 @@ function wxReady() {
  */
 function clickRecord() {
     var defer = $.Deferred();
-    $('#recordBtn').on('tap', function() {
-        console.log(1);
+    $('#recordBtn').on('click', function() {
         var $this = $(this);
+        // 改变文案
+        $this.html('点击结束录音');
         // 是否在录音
         if (!$this.hasClass('recording')) {
+            alert(12);
             $this.addClass('recording');
             wx.startRecord({
                 cancel: function () {
@@ -210,11 +214,13 @@ function clickRecord() {
             return;
         }
         // 再次点击，停止录音
-        $this.removeClass('recording');
+        alert(22);
         wx.stopRecord({
             success: function (res) {
+                $this.removeClass('recording');
                 var localId = res.localId;
-                console.log('localId'+localId);
+                $this.html('点击录音，查询电影');
+                alert(localId);
                 defer.resolve(localId);
             }
         });
@@ -227,6 +233,7 @@ function clickRecord() {
  * @param localId
  */
 function wxTranslate(localId) {
+    alert(33);
     var defer = $.Deferred();
     wx.translateVoice({
         localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
@@ -234,9 +241,9 @@ function wxTranslate(localId) {
         success: function (res) {
             var result = res.translateResult;
             // 语音识别结果
-            $.alert('语音解析结果：' + result);
+            alert('语音解析结果：' + result);
 
-            resolve(result);
+            defer.resolve(result);
         }
     });
     return defer.promise();
@@ -248,7 +255,19 @@ $(function () {
     //query = '功夫熊猫';
     //fetchMovies(query,start,count).then(addItems).then(()=>{$('.infinite-scroll-preloader').show()});
     wxConfig();
-    wxReady().then(clickRecord);
+    wxReady(function(){
+        clickRecord()
+            .then(wxTranslate)
+            .then(fetchMovies)
+            .then(addItems)
+    })
+        //.then(function(){
+        //    clickRecord()
+        //        .then(wxTranslate)
+        //        .then(fetchMovies)
+        //        .then(addItems)
+        //});
+        //then(()=>{$('.infinite-scroll-preloader').show()});
     clickLoad();
 
 });

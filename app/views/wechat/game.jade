@@ -4,6 +4,9 @@ append css
 	link(rel="stylesheet", href="/stylesheets/wechat/game.css")
 
 block content
+	input#timestamp(type="hidden" value='#{timestamp}')
+	input#noncestr(type="hidden" value='#{noncestr}')
+	input#signature(type="hidden" value='#{signature}')
 	.page-group
 		.content.infinite-scroll.infinite-scroll-bottom(data-distance="200")
 			.bar.bar-standard.bar-footer.bar-big.bar-fix
@@ -12,7 +15,6 @@ block content
 
 			.infinite-scroll-preloader(style="display:none")
 				.more more
-
 	script(src="/js/lib/zepto.callbacks.js")
 	script(src="/js/lib/zepto.deferred.js")
 	script(src="/js/wechat/game.js")
